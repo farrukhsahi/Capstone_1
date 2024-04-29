@@ -1,0 +1,96 @@
+```{r}
+# Loading dataset
+countries <- read.csv("countries.csv")
+
+summary(countries)
+```
+
+```{r}
+# there are 19 missing values in growth rate column. before doing exploratory analysis, i must fill missing values.
+# I am using imputation approach to fill this with mean, median or mode.
+# I need to check the outliers befor chosing mean/media/mode. I can check this by boxplot
+
+# boxplot for GDP Growth rate
+boxplot(countries$GDP...real.growth.rate...,
+        main = "Box Plot: GDP Growth Rate",
+        ylab = "GDP Growth Rate (%)")
+```
+```{r}
+# as boxplot shows some outliers, using mode is not appropriate, in this case median is good to impute
+median_growth_rate <- median(countries$GDP...real.growth.rate..., na.rm = TRUE)
+countries$GDP...real.growth.rate...[is.na(countries$GDP...real.growth.rate...)] <- median_growth_rate
+
+# verifying that missing values have been filled or not
+summary(countries$GDP...real.growth.rate...)
+```
+```{r}
+# I am using the same approach to fill the missing values in current account balance as median
+
+median_current_account <- median(countries$Current.account.balance, na.rm = TRUE)
+countries$Current.account.balance[is.na(countries$Current.account.balance)] <- median_current_account
+
+# verifying that missing values have been filled or not
+summary(countries$Current.account.balance)
+```
+```{r}
+# As current account balance are bigger values to read. i am converting them in billions for better readability
+countries$Current.account.balance <- countries$Current.account.balance / 1e9
+```
+
+
+```{r}
+# Histogram for GDP growth rate
+hist(countries$GDP...real.growth.rate...,
+     main = "Distribution of GDP Growth Rate",
+     xlab = "GDP Grwoth Rate",
+     ylab = "Frequency",
+     col = "skyblue",
+     border = "white")
+```
+```{r}
+# Histogram for Current account balance
+hist(countries$Current.account.balance, 
+     main = "Distribution of Current Account Balance",
+     xlab = "Current Account Balance",
+     ylab = "Frequency",
+     col = "lightgreen",
+     border = "white")
+```
+```{r}
+# Scatter plot for GDP growth rate vs. Current account balance
+plot(countries$Current.account.balance, countries$GDP...real.growth.rate...,
+     main = "Scatter Plot: GDP Growth Rate vs. Current Account Balance",
+     xlab = "Current Account Balance",
+     ylab = "GDP Growth Rate",
+     col = "blue")
+```
+
+```{r}
+library(ggplot2)
+Current.account.balance <- countries$Current.account.balance
+
+density_plot <- ggplot(countries) + geom_density(aes(x = Current.account.balance, fill = "Current Account Balance"), alpha = 0.5) + theme_minimal()
+
+print(density_plot)
+```
+
+```{r}
+# Pearson correlation test
+correlation_test <- cor.test(countries$Current.account.balance, countries$GDP...real.growth.rate...)
+
+# Extract correlation coefficient and p-value
+correlation_coefficient <- correlation_test$estimate
+p_value <- correlation_test$p.value
+
+# Print results
+print(paste("Pearson correlation coefficient:", correlation_coefficient))
+print(paste("p-value:", p_value))
+
+# Interpret results
+if (p_value < 0.05) {
+  print("The correlation is statistically significant.")
+} else {
+  print("The correlation is not statistically significant.")
+}
+```
+

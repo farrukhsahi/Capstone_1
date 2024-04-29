@@ -1,0 +1,96 @@
+```{r}
+countries <- read.csv("countries.csv")
+```
+
+```{r}
+options(scipen = 999, digits = 10)
+```
+
+```{r}
+print(countries)
+```
+```{r}
+# Loading libraries
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+```
+
+```{r}
+str(countries)
+summary(countries)
+```
+
+```{r}
+# There is one missing value in GDP per capita. I am imputing it as mean
+missing_values <- sum(is.na(countries$GDP.per.capita))
+
+if (missing_values > 0) {
+  mean_gdp <- mean(countries$GDP.per.capita, na.rm = TRUE)
+  countries$GDP.per.capita[is.na(countries$GDP.per.capita)] <- mean_gdp
+}
+
+# There are 5 missing values in Life expectancy any after birth (years) column. Imputing it with mean
+missing_values_life_expectancy <- sum(is.na(countries$Life.expectancy.at.birth.years.))
+
+if (missing_values_life_expectancy > 0) {
+  mean_life_expectancy <- mean(countries$Life.expectancy.at.birth.years., na.rm = TRUE)
+  countries$Life.expectancy.at.birth.years.[is.na(countries$Life.expectancy.at.birth.years.)] <- mean_life_expectancy
+}
+```
+
+```{r}
+# Calculate the Pearson correlation coefficient
+correlation <- cor(countries$GDP.per.capita, countries$Life.expectancy.at.birth.years.)
+
+# Perform statistical test
+cor_test <- cor.test(countries$GDP.per.capita, countries$Life.expectancy.at.birth.years.)
+
+# Print the results
+print(paste("Pearson correlation coefficient:", correlation))
+print(paste("p-value:", cor_test$p.value))
+
+# Interpret the results
+if (cor_test$p.value < 0.05) {
+  print("The correlation is statistically significant.")
+  if (correlation > 0) {
+    print("There is a positive correlation between GDP per capita and life expectancy.")
+  } else {
+    print("There is a negative correlation between GDP per capita and life expectancy.")
+  }
+} else {
+  print("The correlation is not statistically significant.")
+}
+```
+```{r}
+# Scatter plot of GDP per capita vs. life expectancy
+ggplot(countries, aes(x = GDP.per.capita, y = Life.expectancy.at.birth.years.)) + geom_point() + geom_smooth(method = "lm", se = FALSE, color = "blue") + labs(title = "Scatter plot: GDP per Capita vs. Life Expectancy", x = "GDP per capita", y = "Life Expectancy")
+```
+
+
+```{r}
+# Boxplot of Birth Rate
+ggplot(countries, aes(y = Birth.rate.births.1000.population.)) + geom_boxplot(fill = "orange", color = "black") + labs (title = "Boxplot of Birth Rate", y = "Birth Rate")
+```
+
+```{r}
+# Set up the layout for the plots
+par(mfrow = c(1, 2))
+
+# Histogram for GDP per capita
+hist(countries$GDP.per.capita,
+     main = "Distribution of GDP per capita",
+     xlab = "GDP per Capita",
+     ylab = "Frequency",
+     col = "skyblue",
+     border = "white")
+
+# Histogram for life expectancy
+hist(countries$Life.expectancy.at.birth.years,
+     main = "Distribution of Life Expectancy",
+     xlab = "Life Expectancy",
+     ylab = "Frequency",
+     col = "lightgreen",
+     border = "white")
+```
+

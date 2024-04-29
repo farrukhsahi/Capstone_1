@@ -1,0 +1,62 @@
+Hypothesis
+Natural Resource Management
+
+```{r}
+countries <- read.csv("countries.csv")
+
+summary(countries$Oil...consumption.bbl.day.)
+summary(countries$GDP)
+```
+There are 19 missing values in Oil consumption and 1 in GDP variable. I am deleting the missing data.
+
+```{r}
+countries_4 <- countries[!is.na(countries$`Oil...consumption.bbl.day.`), ]
+
+# Save the new dataset to a CSV file
+write.csv(countries_4, file = "countries_4.csv", row.names = FALSE)
+```
+
+```{r}
+countries_4 <- read.csv("countries_4.csv")
+
+summary(countries$Oil...consumption.bbl.day.)
+```
+```{r}
+countries_5 <- countries[!is.na(countries_4$`GDP`), ]
+
+# Save the new dataset to a CSV file
+write.csv(countries_5, file = "countries_5.csv", row.names = FALSE)
+```
+
+```{r}
+countries_5 <- read.csv("countries_5.csv")
+```
+
+```{r}
+sum(!is.na(countries_5$GDP))
+```
+now i have gotten a new dataset named as countries_5 with equal number of rows of GDP and oil consumption column
+
+
+```{r}
+#Hypothesis Testing
+correlation_result <- cor.test(countries_5$GDP, countries_5$`Oil...consumption.bbl.day.`)
+
+# Print correlation coefficient and p-value
+print(correlation_result)
+```
+```{r}
+log_GDP <- log(countries_5$GDP)
+log_oil_consumption <- log(countries_5$`Oil...consumption.bbl.day.`)
+
+# Scatter plot of GDP against oil consumption
+plot(log_GDP, log_oil_consumption,
+     xlab = "Log(GDP)", ylab = "Log(oil_consumption)",
+     main = "Scater Plot of GDP vs Oil Consumption")
+
+# Add a trendline
+abline(lm(log_GDP ~ log_oil_consumption), col = "red")
+```
+
+
+
